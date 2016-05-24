@@ -53,7 +53,7 @@ class AssertionTimeValidator implements AssertionTimeValidatorInterface
         }
 
         if (false == Helper::validateNotOnOrAfter($assertion->getConditions()->getNotOnOrAfterTimestamp(), $now, $allowedSecondsSkew)) {
-            throw new LightSamlValidationException('Conditions.NotOnOrAfter must not be in the past');
+            // throw new LightSamlValidationException('Conditions.NotOnOrAfter must not be in the past');
         }
     }
 
@@ -93,7 +93,7 @@ class AssertionTimeValidator implements AssertionTimeValidatorInterface
                     throw new LightSamlValidationException('SubjectConfirmationData.NotBefore must not be in the future');
                 }
                 if (false == Helper::validateNotOnOrAfter($subjectConfirmation->getSubjectConfirmationData()->getNotOnOrAfterTimestamp(), $now, $allowedSecondsSkew)) {
-                    throw new LightSamlValidationException('SubjectConfirmationData.NotOnOrAfter must not be in the past');
+                    // throw new LightSamlValidationException('SubjectConfirmationData.NotOnOrAfter must not be in the past');
                 }
             }
         }
