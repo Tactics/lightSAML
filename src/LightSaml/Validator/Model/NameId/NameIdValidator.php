@@ -75,7 +75,7 @@ class NameIdValidator implements NameIdValidatorInterface
         }
 
         if (false == filter_var($nameId->getValue(), FILTER_VALIDATE_EMAIL)) {
-            throw new LightSamlValidationException('Value of NameID is not a valid email address according to the IETF RFC 2822 specification');
+            // throw new LightSamlValidationException('Value of NameID is not a valid email address according to the IETF RFC 2822 specification');
         }
     }
 
