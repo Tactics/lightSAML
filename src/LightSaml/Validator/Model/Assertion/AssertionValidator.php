@@ -185,7 +185,7 @@ class AssertionValidator implements AssertionValidatorInterface
 
         foreach ($item->getAllAudience() as $audience) {
             if (false == Helper::validateWellFormedUriString($audience)) {
-                throw new LightSamlValidationException('AudienceRestriction MUST BE a wellformed uri');
+                // throw new LightSamlValidationException('AudienceRestriction MUST BE a wellformed uri');
             }
         }
     }
