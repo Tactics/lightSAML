@@ -43,7 +43,7 @@ class SignMessageAction extends AbstractProfileAction
     protected function doExecute(ProfileContext $context)
     {
         $shouldSign = $this->shouldSignMessage($context);
-        if ($shouldSign) {
+        if (true || $shouldSign) {
             $signature = $this->signatureResolver->getSignature($context);
             if ($signature) {
                 MessageContextHelper::asSamlMessage($context->getOutboundContext())
