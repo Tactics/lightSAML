@@ -16,13 +16,13 @@ use LightSaml\Model\Metadata\EntityDescriptor;
 
 class EntityContext extends AbstractProfileContext
 {
-    /** @var  string */
+    /** @var string */
     private $entityId;
 
-    /** @var  EntityDescriptor */
+    /** @var EntityDescriptor */
     private $entityDescriptor;
 
-    /** @var  TrustOptions */
+    /** @var TrustOptions */
     private $trustOptions;
 
     /**
@@ -54,8 +54,6 @@ class EntityContext extends AbstractProfileContext
     }
 
     /**
-     * @param EntityDescriptor $entityDescriptor
-     *
      * @return EntityContext
      */
     public function setEntityDescriptor(EntityDescriptor $entityDescriptor)
@@ -74,8 +72,6 @@ class EntityContext extends AbstractProfileContext
     }
 
     /**
-     * @param TrustOptions $trustOptions
-     *
      * @return EntityContext
      */
     public function setTrustOptions(TrustOptions $trustOptions)

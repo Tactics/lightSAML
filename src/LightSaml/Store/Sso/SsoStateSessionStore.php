@@ -16,15 +16,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class SsoStateSessionStore implements SsoStateStoreInterface
 {
-    /** @var  SessionInterface */
+    /** @var SessionInterface */
     protected $session;
 
-    /** @var  string */
+    /** @var string */
     protected $key;
 
     /**
-     * @param SessionInterface $session
-     * @param string           $key
+     * @param string $key
      */
     public function __construct(SessionInterface $session, $key)
     {
@@ -47,8 +46,6 @@ class SsoStateSessionStore implements SsoStateStoreInterface
     }
 
     /**
-     * @param SsoState $ssoState
-     *
      * @return void
      */
     public function set(SsoState $ssoState)

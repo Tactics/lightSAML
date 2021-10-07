@@ -27,20 +27,15 @@ use LightSaml\Validator\Model\Subject\SubjectValidatorInterface;
 
 class AssertionValidator implements AssertionValidatorInterface
 {
-    /** @var  NameIdValidatorInterface */
+    /** @var NameIdValidatorInterface */
     protected $nameIdValidator;
 
-    /** @var  SubjectValidatorInterface */
+    /** @var SubjectValidatorInterface */
     protected $subjectValidator;
 
-    /** @var  StatementValidatorInterface */
+    /** @var StatementValidatorInterface */
     protected $statementValidator;
 
-    /**
-     * @param NameIdValidatorInterface    $nameIdValidator
-     * @param SubjectValidatorInterface   $subjectValidator
-     * @param StatementValidatorInterface $statementValidator
-     */
     public function __construct(
         NameIdValidatorInterface $nameIdValidator,
         SubjectValidatorInterface $subjectValidator,
@@ -52,8 +47,6 @@ class AssertionValidator implements AssertionValidatorInterface
     }
 
     /**
-     * @param Assertion $assertion
-     *
      * @return void
      */
     public function validateAssertion(Assertion $assertion)
@@ -65,8 +58,6 @@ class AssertionValidator implements AssertionValidatorInterface
     }
 
     /**
-     * @param Assertion $assertion
-     *
      * @throws LightSamlValidationException
      */
     protected function validateAssertionAttributes(Assertion $assertion)
@@ -74,7 +65,7 @@ class AssertionValidator implements AssertionValidatorInterface
         if (false == Helper::validateRequiredString($assertion->getVersion())) {
             throw new LightSamlValidationException('Assertion element must have the Version attribute set.');
         }
-        if ($assertion->getVersion() != SamlConstants::VERSION_20) {
+        if (SamlConstants::VERSION_20 != $assertion->getVersion()) {
             throw new LightSamlValidationException('Assertion element must have the Version attribute value equal to 2.0.');
         }
         if (false == Helper::validateRequiredString($assertion->getId())) {
@@ -93,8 +84,6 @@ class AssertionValidator implements AssertionValidatorInterface
     }
 
     /**
-     * @param Assertion $assertion
-     *
      * @throws LightSamlValidationException
      */
     protected function validateSubject(Assertion $assertion)
@@ -153,8 +142,6 @@ class AssertionValidator implements AssertionValidatorInterface
     }
 
     /**
-     * @param ProxyRestriction $item
-     *
      * @throws LightSamlValidationException
      */
     protected function validateProxyRestriction(ProxyRestriction $item)
@@ -173,8 +160,6 @@ class AssertionValidator implements AssertionValidatorInterface
     }
 
     /**
-     * @param AudienceRestriction $item
-     *
      * @throws LightSamlValidationException
      */
     protected function validateAudienceRestriction(AudienceRestriction $item)
@@ -190,9 +175,6 @@ class AssertionValidator implements AssertionValidatorInterface
         }
     }
 
-    /**
-     * @param Assertion $assertion
-     */
     protected function validateStatements(Assertion $assertion)
     {
         if (false == $assertion->getAllItems()) {

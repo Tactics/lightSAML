@@ -26,13 +26,9 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractDestinationValidatorAction extends AbstractProfileAction
 {
-    /** @var  EndpointResolverInterface */
+    /** @var EndpointResolverInterface */
     protected $endpointResolver;
 
-    /**
-     * @param LoggerInterface           $logger
-     * @param EndpointResolverInterface $endpointResolver
-     */
     public function __construct(LoggerInterface $logger, EndpointResolverInterface $endpointResolver)
     {
         parent::__construct($logger);
@@ -41,8 +37,6 @@ abstract class AbstractDestinationValidatorAction extends AbstractProfileAction
     }
 
     /**
-     * @param ProfileContext $context
-     *
      * @return void
      */
     protected function doExecute(ProfileContext $context)
@@ -67,8 +61,7 @@ abstract class AbstractDestinationValidatorAction extends AbstractProfileAction
     }
 
     /**
-     * @param ProfileContext $context
-     * @param string         $location
+     * @param string $location
      *
      * @return CriteriaSet
      */
@@ -76,7 +69,7 @@ abstract class AbstractDestinationValidatorAction extends AbstractProfileAction
     {
         $criteriaSet = new CriteriaSet([
             new DescriptorTypeCriteria(
-                $context->getOwnRole() === ProfileContext::ROLE_IDP
+                ProfileContext::ROLE_IDP === $context->getOwnRole()
                 ? IdpSsoDescriptor::class
                 : SpSsoDescriptor::class
             ),

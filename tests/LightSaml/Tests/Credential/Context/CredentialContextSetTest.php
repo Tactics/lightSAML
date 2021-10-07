@@ -4,8 +4,9 @@ namespace LightSaml\Tests\Credential\Context;
 
 use LightSaml\Credential\Context\CredentialContextSet;
 use LightSaml\Credential\Context\MetadataCredentialContext;
+use LightSaml\Tests\BaseTestCase;
 
-class CredentialContextSetTest extends \PHPUnit_Framework_TestCase
+class CredentialContextSetTest extends BaseTestCase
 {
     public function test_metadata_context_is_null_upon_creation()
     {
@@ -32,12 +33,10 @@ class CredentialContextSetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected[1], $all[1]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected CredentialContextInterface
-     */
     public function test_throws_invalid_argument_exception_if_constructed_with_non_credential_context_array()
     {
+        $this->expectExceptionMessage("Expected CredentialContextInterface");
+        $this->expectException(\InvalidArgumentException::class);
         new CredentialContextSet([new \stdClass()]);
     }
 
@@ -46,6 +45,8 @@ class CredentialContextSetTest extends \PHPUnit_Framework_TestCase
      */
     private function getMetadataContextMock()
     {
-        return $this->getMock('LightSaml\Credential\Context\MetadataCredentialContext', array(), array(), '', false);
+        return $this->getMockBuilder(\LightSaml\Credential\Context\MetadataCredentialContext::class)
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

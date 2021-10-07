@@ -6,6 +6,7 @@ use LightSaml\Model\Context\DeserializationContext;
 use LightSaml\Model\Metadata\ContactPerson;
 use LightSaml\Model\Metadata\EntitiesDescriptor;
 use LightSaml\SamlConstants;
+use LightSaml\Tests\BaseTestCase;
 use LightSaml\Tests\Helper\ContactPersonChecker;
 use LightSaml\Tests\Helper\EndpointChecker;
 use LightSaml\Tests\Helper\IndexedEndpointChecker;
@@ -13,7 +14,7 @@ use LightSaml\Tests\Helper\KeyDescriptorChecker;
 use LightSaml\Tests\Helper\NameIdFormatChecker;
 use LightSaml\Tests\Helper\OrganizationChecker;
 
-class EntitiesDescriptorFunctionalTest extends \PHPUnit_Framework_TestCase
+class EntitiesDescriptorFunctionalTest extends BaseTestCase
 {
     public function test__deserialize_test_shib()
     {
@@ -219,12 +220,10 @@ class EntitiesDescriptorFunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2935, $entitiesDescriptor->getAllEntityDescriptors());
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlXmlException
-     * @expectedExceptionMessage Expected 'EntitiesDescriptor' xml node and 'urn:oasis:names:tc:SAML:2.0:metadata' namespace but got node 'EntityDescriptor' and namespace 'urn:oasis:names:tc:SAML:2.0:metadata'
-     */
     public function test_throws_on_entity_descriptor()
     {
+        $this->expectExceptionMessage("Expected 'EntitiesDescriptor' xml node and 'urn:oasis:names:tc:SAML:2.0:metadata' namespace but got node 'EntityDescriptor' and namespace 'urn:oasis:names:tc:SAML:2.0:metadata'");
+        $this->expectException(\LightSaml\Error\LightSamlXmlException::class);
         EntitiesDescriptor::load(__DIR__.'/../../../../../../resources/sample/EntityDescriptor/idp-ed.xml');
     }
 }

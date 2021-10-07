@@ -4,16 +4,15 @@ namespace LightSaml\Tests\Binding;
 
 use LightSaml\Binding\HttpRedirectBinding;
 use LightSaml\Context\Profile\MessageContext;
+use LightSaml\Tests\BaseTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class HttpRedirectBindingTest extends \PHPUnit_Framework_TestCase
+class HttpRedirectBindingTest extends BaseTestCase
 {
-    /**
-     * @expectedException \LightSaml\Error\LightSamlBindingException
-     * @expectedExceptionMessage Missing SAMLRequest or SAMLResponse parameter
-     */
     public function test__receive_throws_when_no_message()
     {
+        $this->expectExceptionMessage("Missing SAMLRequest or SAMLResponse parameter");
+        $this->expectException(\LightSaml\Error\LightSamlBindingException::class);
         $request = new Request();
 
         $binding = new HttpRedirectBinding();

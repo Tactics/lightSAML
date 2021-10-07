@@ -11,10 +11,12 @@ use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\Model\Protocol\SamlMessage;
 use LightSaml\Model\SamlElementInterface;
 use LightSaml\Model\XmlDSig\SignatureWriter;
+use LightSaml\Tests\BaseTestCase;
+use LightSaml\Validator\Model\Xsd\XsdValidator;
 
-abstract class AbstractXsdValidationTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractXsdValidationTest extends BaseTestCase
 {
-    protected function setUp()
+    protected function setUp() : void
     {
         libxml_use_internal_errors(true);
     }
@@ -43,7 +45,13 @@ abstract class AbstractXsdValidationTest extends \PHPUnit_Framework_TestCase
      */
     protected function validateProtocol(SamlElementInterface $samlElement)
     {
-        $this->validate($samlElement, 'saml-schema-protocol-2.0.xsd');
+        $validator = new XsdValidator();
+        $xml = $this->serialize($samlElement);
+        $errors = $validator->validateProtocol($xml);
+        if ($errors) {
+            $this->fail("\n".implode("\n", $errors)."\n\n$xml\n\n");
+        }
+        $this->assertTrue(true);
     }
 
     /**
@@ -51,50 +59,25 @@ abstract class AbstractXsdValidationTest extends \PHPUnit_Framework_TestCase
      */
     protected function validateMetadata(SamlElementInterface $samlElement)
     {
-        $this->validate($samlElement, 'saml-schema-metadata-2.0.xsd');
+        $validator = new XsdValidator();
+        $xml = $this->serialize($samlElement);
+        $errors = $validator->validateMetadata($xml);
+        if ($errors) {
+            $this->fail("\n".implode("\n", $errors)."\n\n$xml\n\n");
+        }
+        $this->assertTrue(true);
     }
 
     /**
      * @param SamlElementInterface $samlElement
-     * @param string               $schema
+     *
+     * @return string
      */
-    private function validate(SamlElementInterface $samlElement, $schema)
+    private function serialize(SamlElementInterface $samlElement)
     {
         $serializationContext = new SerializationContext();
         $samlElement->serialize($serializationContext->getDocument(), $serializationContext);
 
-        $xml = $serializationContext->getDocument()->saveXML();
-
-        $ok = $serializationContext->getDocument()->schemaValidate(__DIR__.'/../../../../../xsd/'.$schema);
-
-        if ($ok) {
-            $this->assertTrue(true);
-
-            return;
-        }
-
-        $levels = [
-            LIBXML_ERR_WARNING => 'Warning',
-            LIBXML_ERR_ERROR => 'Error',
-            LIBXML_ERR_FATAL => 'Fatal',
-        ];
-
-        $arr = [];
-        /** @var \LibXMLError[] $errors */
-        $errors = libxml_get_errors();
-        foreach ($errors as $error) {
-            $level = @$levels[$error->level] ?: 'Unknown';
-            $msg = sprintf(
-                '%s %s: %s on line %s column %s',
-                $level,
-                $error->code,
-                trim($error->message),
-                $error->line,
-                $error->column
-            );
-            $arr[] = $msg;
-        }
-
-        $this->fail("\n".implode("\n", $arr)."\n\n$xml\n\n");
+        return $serializationContext->getDocument()->saveXML();
     }
 }

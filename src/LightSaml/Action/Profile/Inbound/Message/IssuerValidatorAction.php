@@ -22,16 +22,14 @@ use Psr\Log\LoggerInterface;
 
 class IssuerValidatorAction extends AbstractProfileAction
 {
-    /** @var  NameIdValidatorInterface */
+    /** @var NameIdValidatorInterface */
     protected $nameIdValidator;
 
-    /** @var  string */
+    /** @var string */
     protected $allowedFormat;
 
     /**
-     * @param LoggerInterface          $logger
-     * @param NameIdValidatorInterface $nameIdValidator
-     * @param string                   $allowedFormat
+     * @param string $allowedFormat
      */
     public function __construct(LoggerInterface $logger, NameIdValidatorInterface $nameIdValidator, $allowedFormat)
     {
@@ -42,8 +40,6 @@ class IssuerValidatorAction extends AbstractProfileAction
     }
 
     /**
-     * @param ProfileContext $context
-     *
      * @return void
      */
     protected function doExecute(ProfileContext $context)

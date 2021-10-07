@@ -22,12 +22,11 @@ use Psr\Log\LoggerInterface;
  */
 class MessageVersionAction extends AbstractProfileAction
 {
-    /** @var  string */
+    /** @var string */
     private $version;
 
     /**
-     * @param LoggerInterface $logger
-     * @param string          $version
+     * @param string $version
      */
     public function __construct(LoggerInterface $logger, $version)
     {
@@ -37,8 +36,6 @@ class MessageVersionAction extends AbstractProfileAction
     }
 
     /**
-     * @param ProfileContext $context
-     *
      * @return void
      */
     protected function doExecute(ProfileContext $context)

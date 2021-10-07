@@ -13,20 +13,15 @@ namespace LightSaml\Model\Metadata;
 
 class EndpointReference
 {
-    /** @var  EntityDescriptor */
+    /** @var EntityDescriptor */
     protected $entityDescriptor;
 
     /** @var RoleDescriptor */
     protected $descriptor;
 
-    /** @var  Endpoint */
+    /** @var Endpoint */
     protected $endpoint;
 
-    /**
-     * @param EntityDescriptor $entityDescriptor
-     * @param RoleDescriptor   $descriptor
-     * @param Endpoint         $endpoint
-     */
     public function __construct(EntityDescriptor $entityDescriptor, RoleDescriptor $descriptor, Endpoint $endpoint)
     {
         $this->entityDescriptor = $entityDescriptor;

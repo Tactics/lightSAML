@@ -11,9 +11,9 @@
 
 namespace LightSaml\Provider\Credential;
 
-use LightSaml\Credential\X509Credential;
 use LightSaml\Credential\KeyHelper;
 use LightSaml\Credential\X509Certificate;
+use LightSaml\Credential\X509Credential;
 
 class X509CredentialFileProvider implements CredentialProviderInterface
 {
@@ -29,7 +29,7 @@ class X509CredentialFileProvider implements CredentialProviderInterface
     /** @var string */
     private $privateKeyPassword;
 
-    /** @var  X509Credential */
+    /** @var X509Credential */
     private $credential;
 
     /**

@@ -10,36 +10,35 @@ use LightSaml\Model\Assertion\Subject;
 use LightSaml\Model\Assertion\SubjectConfirmation;
 use LightSaml\Model\Assertion\SubjectConfirmationData;
 use LightSaml\SamlConstants;
-use LightSaml\Tests\TestHelper;
+use LightSaml\Tests\BaseTestCase;
 
-class RepeatedIdValidatorActionTest extends \PHPUnit_Framework_TestCase
+class RepeatedIdValidatorActionTest extends BaseTestCase
 {
     public function test_constructs_with_logger_and_id_store()
     {
-        new RepeatedIdValidatorAction(TestHelper::getLoggerMock($this), TestHelper::getIdStoreMock($this));
+        new RepeatedIdValidatorAction($this->getLoggerMock(), $this->getIdStoreMock());
+        $this->assertTrue(true);
     }
 
     public function test_does_nothing_if_assertion_has_no_bearer_subject()
     {
-        $action = new RepeatedIdValidatorAction(TestHelper::getLoggerMock($this), TestHelper::getIdStoreMock($this));
+        $action = new RepeatedIdValidatorAction($this->getLoggerMock(), $this->getIdStoreMock());
 
-        $assertionContext = TestHelper::getAssertionContext(new Assertion());
+        $assertionContext = $this->getAssertionContext(new Assertion());
 
         $action->execute($assertionContext);
+
+        $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlContextException
-     * @expectedExceptionMessage Bearer Assertion must have ID attribute
-     */
     public function test_throws_context_exception_when_bearer_assertion_has_no_id()
     {
         $action = new RepeatedIdValidatorAction(
-            $loggerMock = TestHelper::getLoggerMock($this),
-            $idStoreMock = TestHelper::getIdStoreMock($this)
+            $loggerMock = $this->getLoggerMock(),
+            $idStoreMock = $this->getIdStoreMock()
         );
 
-        $assertionContext = TestHelper::getAssertionContext($assertion = new Assertion());
+        $assertionContext = $this->getAssertionContext($assertion = new Assertion());
         $assertion->addItem(new AuthnStatement());
         $assertion->setSubject(new Subject());
         $assertion->getSubject()->addSubjectConfirmation($subjectConfirmation = new SubjectConfirmation());
@@ -49,21 +48,20 @@ class RepeatedIdValidatorActionTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with('Bearer Assertion must have ID attribute', $this->isType('array'));
 
+        $this->expectExceptionMessage("Bearer Assertion must have ID attribute");
+        $this->expectException(\LightSaml\Error\LightSamlContextException::class);
+
         $action->execute($assertionContext);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlContextException
-     * @expectedExceptionMessage Bearer Assertion must have Issuer element
-     */
     public function test_throws_context_exception_when_bearer_assertion_has_no_issuer()
     {
         $action = new RepeatedIdValidatorAction(
-            $loggerMock = TestHelper::getLoggerMock($this),
-            $idStoreMock = TestHelper::getIdStoreMock($this)
+            $loggerMock = $this->getLoggerMock(),
+            $idStoreMock = $this->getIdStoreMock()
         );
 
-        $assertionContext = TestHelper::getAssertionContext($assertion = new Assertion());
+        $assertionContext = $this->getAssertionContext($assertion = new Assertion());
         $assertion->setId($assertionId = '123');
         $assertion->addItem(new AuthnStatement());
         $assertion->setSubject(new Subject());
@@ -74,21 +72,20 @@ class RepeatedIdValidatorActionTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with('Bearer Assertion must have Issuer element', $this->isType('array'));
 
+        $this->expectExceptionMessage("Bearer Assertion must have Issuer element");
+        $this->expectException(\LightSaml\Error\LightSamlContextException::class);
+
         $action->execute($assertionContext);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlContextException
-     * @expectedExceptionMessage Repeated assertion id '123' of issuer 'http://issuer.com'
-     */
     public function test_throws_context_exception_for_known_assertion_id()
     {
         $action = new RepeatedIdValidatorAction(
-            $loggerMock = TestHelper::getLoggerMock($this),
-            $idStoreMock = TestHelper::getIdStoreMock($this)
+            $loggerMock = $this->getLoggerMock(),
+            $idStoreMock = $this->getIdStoreMock()
         );
 
-        $assertionContext = TestHelper::getAssertionContext($assertion = new Assertion());
+        $assertionContext = $this->getAssertionContext($assertion = new Assertion());
         $assertion->setId($assertionId = '123');
         $assertion->setIssuer(new Issuer($issuer = 'http://issuer.com'));
         $assertion->addItem(new AuthnStatement());
@@ -105,21 +102,21 @@ class RepeatedIdValidatorActionTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with("Repeated assertion id '123' of issuer 'http://issuer.com'", $this->isType('array'));
 
+        $this->expectExceptionMessage("Repeated assertion id '123' of issuer 'http://issuer.com'");
+        $this->expectException(\LightSaml\Error\LightSamlContextException::class);
+
         $action->execute($assertionContext);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlContextException
-     * @expectedExceptionMessage Bearer SubjectConfirmation must have SubjectConfirmationData element
-     */
     public function test_throws_context_exception_if_no_subject_confirmation_data()
     {
+
         $action = new RepeatedIdValidatorAction(
-            $loggerMock = TestHelper::getLoggerMock($this),
-            $idStoreMock = TestHelper::getIdStoreMock($this)
+            $loggerMock = $this->getLoggerMock(),
+            $idStoreMock = $this->getIdStoreMock()
         );
 
-        $assertionContext = TestHelper::getAssertionContext($assertion = new Assertion());
+        $assertionContext = $this->getAssertionContext($assertion = new Assertion());
         $assertion->setId($assertionId = '123');
         $assertion->setIssuer(new Issuer($issuer = 'http://issuer.com'));
         $assertion->addItem(new AuthnStatement());
@@ -136,21 +133,22 @@ class RepeatedIdValidatorActionTest extends \PHPUnit_Framework_TestCase
             ->method('error')
             ->with('Bearer SubjectConfirmation must have SubjectConfirmationData element', $this->isType('array'));
 
+        $this->expectExceptionMessage("Bearer SubjectConfirmation must have SubjectConfirmationData element");
+        $this->expectException(\LightSaml\Error\LightSamlContextException::class);
+
         $action->execute($assertionContext);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlContextException
-     * @expectedExceptionMessage Bearer SubjectConfirmation must have NotOnOrAfter attribute
-     */
     public function test_throws_context_exception_if_no_not_on_or_after_attribute()
     {
+        $this->expectExceptionMessage("Bearer SubjectConfirmation must have NotOnOrAfter attribute");
+        $this->expectException(\LightSaml\Error\LightSamlContextException::class);
         $action = new RepeatedIdValidatorAction(
-            $loggerMock = TestHelper::getLoggerMock($this),
-            $idStoreMock = TestHelper::getIdStoreMock($this)
+            $loggerMock = $this->getLoggerMock(),
+            $idStoreMock = $this->getIdStoreMock()
         );
 
-        $assertionContext = TestHelper::getAssertionContext($assertion = new Assertion());
+        $assertionContext = $this->getAssertionContext($assertion = new Assertion());
         $assertion->setId($assertionId = '123');
         $assertion->setIssuer(new Issuer($issuer = 'http://issuer.com'));
         $assertion->addItem(new AuthnStatement());
@@ -174,11 +172,11 @@ class RepeatedIdValidatorActionTest extends \PHPUnit_Framework_TestCase
     public function test_sets_unknown_assertion_id_to_store()
     {
         $action = new RepeatedIdValidatorAction(
-            $loggerMock = TestHelper::getLoggerMock($this),
-            $idStoreMock = TestHelper::getIdStoreMock($this)
+            $loggerMock = $this->getLoggerMock(),
+            $idStoreMock = $this->getIdStoreMock()
         );
 
-        $assertionContext = TestHelper::getAssertionContext($assertion = new Assertion());
+        $assertionContext = $this->getAssertionContext($assertion = new Assertion());
         $assertion->setId($assertionId = '123');
         $assertion->setIssuer(new Issuer($issuer = 'http://issuer.com'));
         $assertion->addItem(new AuthnStatement());

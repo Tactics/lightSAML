@@ -15,10 +15,10 @@ use LightSaml\State\Sso\SsoSessionState;
 
 class LogoutContext extends AbstractProfileContext
 {
-    /** @var  SsoSessionState|null */
+    /** @var SsoSessionState|null */
     protected $ssoSessionState;
 
-    /** @var  bool */
+    /** @var bool */
     protected $allSsoSessionsTerminated = false;
 
     /**
@@ -30,8 +30,6 @@ class LogoutContext extends AbstractProfileContext
     }
 
     /**
-     * @param SsoSessionState $ssoSessionState
-     *
      * @return LogoutContext
      */
     public function setSsoSessionState(SsoSessionState $ssoSessionState)

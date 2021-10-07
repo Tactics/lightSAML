@@ -15,19 +15,18 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class RequestStateSessionStore extends AbstractRequestStateArrayStore
 {
-    /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface  */
+    /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface */
     protected $session;
 
-    /** @var string  */
+    /** @var string */
     protected $providerId;
 
-    /** @var string  */
+    /** @var string */
     protected $prefix;
 
     /**
-     * @param SessionInterface $session
-     * @param string           $providerId
-     * @param string           $prefix
+     * @param string $providerId
+     * @param string $prefix
      */
     public function __construct(SessionInterface $session, $providerId, $prefix = 'saml_request_state_')
     {
@@ -49,12 +48,10 @@ class RequestStateSessionStore extends AbstractRequestStateArrayStore
      */
     protected function getArray()
     {
-        return $this->session->get($this->getKey(), array());
+        return $this->session->get($this->getKey(), []);
     }
 
     /**
-     * @param array $arr
-     *
      * @return AbstractRequestStateArrayStore
      */
     protected function setArray(array $arr)

@@ -12,9 +12,9 @@
 namespace LightSaml\Model\Assertion;
 
 use LightSaml\Error\LightSamlModelException;
+use LightSaml\Model\AbstractSamlModel;
 use LightSaml\Model\Context\DeserializationContext;
 use LightSaml\Model\Context\SerializationContext;
-use LightSaml\Model\AbstractSamlModel;
 use LightSaml\SamlConstants;
 
 abstract class AbstractNameID extends AbstractSamlModel
@@ -55,7 +55,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @param null|string $format
+     * @param string|null $format
      *
      * @return AbstractNameID
      */
@@ -67,7 +67,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getFormat()
     {
@@ -75,7 +75,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @param null|string $nameQualifier
+     * @param string|null $nameQualifier
      *
      * @return AbstractNameID
      */
@@ -87,7 +87,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getNameQualifier()
     {
@@ -95,7 +95,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @param null|string $spNameQualifier
+     * @param string|null $spNameQualifier
      *
      * @return AbstractNameID
      */
@@ -107,7 +107,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getSPNameQualifier()
     {
@@ -115,7 +115,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @param null|string $spProvidedId
+     * @param string|null $spProvidedId
      *
      * @return AbstractNameID
      */
@@ -127,7 +127,7 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getSPProvidedID()
     {
@@ -162,34 +162,27 @@ abstract class AbstractNameID extends AbstractSamlModel
     }
 
     /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     *
      * @return \DOMElement
      */
     public function serialize(\DOMNode $parent, SerializationContext $context)
     {
         $this->prepareForXml();
-        if ($parent->namespaceURI == SamlConstants::NS_ASSERTION) {
+        if (SamlConstants::NS_ASSERTION == $parent->namespaceURI) {
             $result = $this->createElement($this->getElementName(), SamlConstants::NS_ASSERTION, $parent, $context);
         } else {
             $result = $this->createElement('saml:'.$this->getElementName(), SamlConstants::NS_ASSERTION, $parent, $context);
         }
 
         /* @var \DOMElement $parent */
-        $this->attributesToXml(array('Format', 'NameQualifier', 'SPNameQualifier', 'SPProvidedID'), $result);
+        $this->attributesToXml(['Format', 'NameQualifier', 'SPNameQualifier', 'SPProvidedID'], $result);
         $result->nodeValue = $this->getValue();
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
         $this->checkXmlNodeName($node, $this->getElementName(), SamlConstants::NS_ASSERTION);
 
-        $this->attributesFromXml($node, array('NameQualifier', 'Format', 'SPNameQualifier', 'SPProvidedID'));
+        $this->attributesFromXml($node, ['NameQualifier', 'Format', 'SPNameQualifier', 'SPProvidedID']);
         $this->setValue($node->textContent);
     }
 

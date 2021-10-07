@@ -11,13 +11,15 @@
 
 namespace LightSaml\State\Request;
 
+use LightSaml\Meta\ParameterBag;
+
 class RequestState implements \Serializable
 {
-    /** @var  string */
-    protected $id;
+    /** @var string */
+    private $id;
 
-    /** @var  mixed */
-    protected $nonce;
+    /** @var ParameterBag */
+    private $parameters;
 
     /**
      * @param string $id
@@ -26,7 +28,10 @@ class RequestState implements \Serializable
     public function __construct($id = null, $nonce = null)
     {
         $this->id = $id;
-        $this->nonce = $nonce;
+        $this->parameters = new ParameterBag();
+        if ($nonce) {
+            $this->parameters->set('nonce', $nonce);
+        }
     }
 
     /**
@@ -50,45 +55,62 @@ class RequestState implements \Serializable
     }
 
     /**
+     * @return ParameterBag
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @deprecated Since 1.2, to be removed in 2.0. Use getParameters() instead
+     *
      * @param mixed $nonce
      *
      * @return RequestState
      */
     public function setNonce($nonce)
     {
-        $this->nonce = $nonce;
+        $this->parameters->set('nonce', $nonce);
 
         return $this;
     }
 
     /**
+     * @deprecated Since 1.2, to be removed in 2.0. Use getParameters() instead
+     *
      * @return mixed
      */
     public function getNonce()
     {
-        return $this->nonce;
+        return $this->parameters->get('nonce');
     }
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
      * String representation of object.
      *
-     * @link http://php.net/manual/en/serializable.serialize.php
+     * @see http://php.net/manual/en/serializable.serialize.php
      *
      * @return string the string representation of the object or null
      */
     public function serialize()
     {
-        return serialize(array($this->id, $this->nonce));
+        $nonce = $this->getNonce();
+
+        return serialize([$this->id, $nonce, $this->parameters->serialize()]);
     }
 
     /**
-     * @param string $serialized The string representation of the object.
+     * @param string $serialized The string representation of the object
      *
      * @return void
      */
     public function unserialize($serialized)
     {
-        list($this->id, $this->nonce) = unserialize($serialized);
+        $nonce = null;
+        $this->parameters = new ParameterBag();
+        list($this->id, $nonce, $parameters) = unserialize($serialized);
+        $this->parameters->unserialize($parameters);
     }
 }

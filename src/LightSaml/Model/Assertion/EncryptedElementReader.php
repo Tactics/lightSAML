@@ -12,22 +12,22 @@
 namespace LightSaml\Model\Assertion;
 
 use LightSaml\Credential\CredentialInterface;
-use LightSaml\Model\Context\DeserializationContext;
-use LightSaml\Model\Context\SerializationContext;
 use LightSaml\Error\LightSamlSecurityException;
 use LightSaml\Error\LightSamlXmlException;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
+use LightSaml\Model\Context\DeserializationContext;
+use LightSaml\Model\Context\SerializationContext;
 use RobRichards\XMLSecLibs\XMLSecEnc;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class EncryptedElementReader extends EncryptedElement
 {
     /** @var XMLSecEnc */
     protected $xmlEnc;
 
-    /** @var  XMLSecurityKey */
+    /** @var XMLSecurityKey */
     protected $symmetricKey;
 
-    /** @var  XMLSecurityKey */
+    /** @var XMLSecurityKey */
     protected $symmetricKeyInfo;
 
     /**
@@ -47,9 +47,6 @@ class EncryptedElementReader extends EncryptedElement
     }
 
     /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     *
      * @throws \LogicException
      *
      * @return void
@@ -59,10 +56,6 @@ class EncryptedElementReader extends EncryptedElement
         throw new \LogicException('EncryptedElementReader can not be used for serialization');
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
         $list = $context->getXpath()->query('xenc:EncryptedData', $node);
@@ -121,8 +114,6 @@ class EncryptedElementReader extends EncryptedElement
     }
 
     /**
-     * @param XMLSecurityKey $inputKey
-     *
      * @throws \LogicException
      * @throws \LightSaml\Error\LightSamlXmlException
      * @throws \LightSaml\Error\LightSamlSecurityException
@@ -137,8 +128,6 @@ class EncryptedElementReader extends EncryptedElement
         if ($this->symmetricKeyInfo->isEncrypted) {
             $this->decryptSymmetricKey($inputKey);
         } else {
-            $this->checkInputAndMessageKeyAlgoSame($inputKey->getAlgorith(), $this->symmetricKey->getAlgorith());
-
             $this->symmetricKey = $inputKey;
         }
 
@@ -197,34 +186,19 @@ class EncryptedElementReader extends EncryptedElement
     }
 
     /**
-     * @param XMLSecurityKey $inputKey
-     *
      * @throws \Exception
      */
     protected function decryptSymmetricKey(XMLSecurityKey $inputKey)
     {
-        $inputKeyAlgo = $inputKey->getAlgorith();
-        if ($this->symmetricKeyInfo->getAlgorith() === XMLSecurityKey::RSA_OAEP_MGF1P &&
-            ($inputKeyAlgo === XMLSecurityKey::RSA_1_5 || $inputKeyAlgo === XMLSecurityKey::RSA_SHA1)) {
-            // The RSA key formats are equal, so loading an RSA_1_5 key into an RSA_OAEP_MGF1P key can be done without problems.
-            // We therefore pretend that the input key is an RSA_OAEP_MGF1P key.
-            $inputKeyAlgo = XMLSecurityKey::RSA_OAEP_MGF1P;
-        }
-
-        $this->checkInputAndMessageKeyAlgoSame($inputKeyAlgo, $this->symmetricKeyInfo->getAlgorith());
-
         /** @var XMLSecEnc $encKey */
         $encKey = $this->symmetricKeyInfo->encryptedCtx;
         $this->symmetricKeyInfo->key = $inputKey->key;
 
         $keySize = $this->symmetricKey->getSymmetricKeySize();
-        if ($keySize === null) {
+        if (null === $keySize) {
             // To protect against "key oracle" attacks, we need to be able to create a
             // symmetric key, and for that we need to know the key size.
-            throw new LightSamlSecurityException(sprintf(
-                "Unknown key size for encryption algorithm: '%s'",
-                $this->symmetricKey->type
-            ));
+            throw new LightSamlSecurityException(sprintf("Unknown key size for encryption algorithm: '%s'", $this->symmetricKey->type));
         }
 
         /** @var string $key */
@@ -233,33 +207,10 @@ class EncryptedElementReader extends EncryptedElement
             throw new \LogicException('Expected string');
         }
         if (strlen($key) != $keySize) {
-            throw new LightSamlSecurityException(sprintf(
-                "Unexpected key size of '%s' bits for encryption algorithm '%s', expected '%s' bits size",
-                strlen($key) * 8,
-                $this->symmetricKey->type,
-                $keySize
-            ));
+            throw new LightSamlSecurityException(sprintf("Unexpected key size of '%s' bits for encryption algorithm '%s', expected '%s' bits size", strlen($key) * 8, $this->symmetricKey->type, $keySize));
         }
 
         $this->symmetricKey->loadkey($key);
-    }
-
-    /**
-     * @param string $inputKeyAlgo
-     * @param string $messageKeyAlgo
-     *
-     * @throws LightSamlSecurityException If two specified key algorithms are not the same
-     */
-    protected function checkInputAndMessageKeyAlgoSame($inputKeyAlgo, $messageKeyAlgo)
-    {
-        // Make sure that the input key format is the same as the one used to encrypt the key.
-        if ($inputKeyAlgo !== $messageKeyAlgo) {
-            throw new LightSamlSecurityException(sprintf(
-                "Algorithm mismatch between input key and key used to encrypt the symmetric key for the message. Input key algo is: '%s'. Message key algo is '%s'",
-                $inputKeyAlgo,
-                $messageKeyAlgo
-            ));
-        }
     }
 
     /**
@@ -278,8 +229,6 @@ class EncryptedElementReader extends EncryptedElement
     }
 
     /**
-     * @param XMLSecurityKey $symmetricKey
-     *
      * @throws \LightSaml\Error\LightSamlXmlException
      *
      * @return XMLSecurityKey

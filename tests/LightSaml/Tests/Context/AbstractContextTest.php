@@ -7,9 +7,9 @@ use LightSaml\Context\Profile\AssertionContext;
 use LightSaml\Context\Profile\EntityContext;
 use LightSaml\Context\Profile\ProfileContext;
 use LightSaml\Context\Profile\RequestStateContext;
-use LightSaml\Tests\TestHelper;
+use LightSaml\Tests\BaseTestCase;
 
-class AbstractContextTest extends \PHPUnit_Framework_TestCase
+class AbstractContextTest extends BaseTestCase
 {
     public function test_set_value_sets_parent()
     {
@@ -71,12 +71,10 @@ class AbstractContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($context->getSubContext('other'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected object or ContextInterface
-     */
     public function test_add_sub_context_throws_if_not_a_context_value()
     {
+        $this->expectExceptionMessage("Expected object or ContextInterface");
+        $this->expectException(\InvalidArgumentException::class);
         $context = $this->getContextMock();
         $context->addSubContext($name = 'some', '123');
         $context->getSubContext($name);
@@ -191,7 +189,7 @@ class AbstractContextTest extends \PHPUnit_Framework_TestCase
 
     public function test_debug_tree()
     {
-        $profileContext = TestHelper::getProfileContext();
+        $profileContext = $this->getProfileContext();
         $profileContext->getOwnEntityContext();
         $profileContext->getPartyEntityContext();
         $profileContext->addSubContext('assertion_01', $assertionSubContext01 = new AssertionContext());
@@ -216,7 +214,7 @@ class AbstractContextTest extends \PHPUnit_Framework_TestCase
 
     public function test_to_string_gives_debug_tree_string()
     {
-        $profileContext = TestHelper::getProfileContext();
+        $profileContext = $this->getProfileContext();
         $profileContext->getOwnEntityContext();
         $profileContext->getPartyEntityContext();
         $profileContext->addSubContext('assertion_01', $assertionSubContext01 = new AssertionContext());
@@ -237,8 +235,7 @@ class AbstractContextTest extends \PHPUnit_Framework_TestCase
     }
 }
 EOT;
-
-        $this->assertEquals($expected, $actual);
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     /**

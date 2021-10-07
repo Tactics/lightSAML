@@ -22,19 +22,15 @@ use Pimple\ServiceProviderInterface;
 
 class CredentialContainerProvider implements ServiceProviderInterface
 {
-    /** @var  PartyContainerInterface */
+    /** @var PartyContainerInterface */
     private $partyContainer;
 
-    /** @var  OwnContainerInterface */
+    /** @var OwnContainerInterface */
     private $ownContainer;
 
     /** @var CredentialInterface[] */
-    private $extraCredentials = array();
+    private $extraCredentials = [];
 
-    /**
-     * @param PartyContainerInterface $partyContainer
-     * @param OwnContainerInterface   $ownContainer
-     */
     public function __construct(PartyContainerInterface $partyContainer, OwnContainerInterface $ownContainer)
     {
         $this->ownContainer = $ownContainer;
@@ -42,8 +38,6 @@ class CredentialContainerProvider implements ServiceProviderInterface
     }
 
     /**
-     * @param CredentialInterface $credential
-     *
      * @return CredentialContainerProvider
      */
     public function addExtraCredential(CredentialInterface $credential)

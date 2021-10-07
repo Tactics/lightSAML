@@ -4,8 +4,9 @@ namespace LightSaml\Tests\Tests;
 
 use LightSaml\Helper;
 use LightSaml\SamlConstants;
+use LightSaml\Tests\BaseTestCase;
 
-class HelperTest extends \PHPUnit_Framework_TestCase
+class HelperTest extends BaseTestCase
 {
     protected $timestamps = array(
         array(1412399250, '2014-10-04T05:07:30Z'),
@@ -26,8 +27,25 @@ class HelperTest extends \PHPUnit_Framework_TestCase
      */
     public function string2TimestampProvider()
     {
+        $timestamps = array_merge(
+            $this->timestamps,
+            [
+                array(1412399250, '2014-10-04T05:07:30+00:00'),
+                array(1412368132, '2014-10-03T20:28:52+00:00'),
+                array(1412331547, '2014-10-03T10:19:07+00:00'),
+                array(1412399250, '2014-10-04T05:07:30.000+00:00'),
+                array(1412368132, '2014-10-03T20:28:52.000+00:00'),
+                array(1412331547, '2014-10-03T10:19:07.000+00:00'),
+                array(1412399250, '2014-10-04T06:07:30+01:00'),
+                array(1412368132, '2014-10-03T21:28:52+01:00'),
+                array(1412331547, '2014-10-03T11:19:07+01:00'),
+                array(1412399250, '2014-10-04T06:07:30.000+01:00'),
+                array(1412368132, '2014-10-03T21:28:52.000+01:00'),
+                array(1412331547, '2014-10-03T11:19:07.000+01:00'),
+            ]
+        );
         $result = array();
-        foreach ($this->timestamps as $arr) {
+        foreach ($timestamps as $arr) {
             $result[] = array($arr[1], $arr[0]);
         }
 
@@ -78,11 +96,9 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($timestamp, Helper::getTimestampFromValue($timestamp));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function test__get_timestamp_from_value_with_invalid_value()
     {
+        $this->expectException(\InvalidArgumentException::class);
         Helper::getTimestampFromValue(array());
     }
 
@@ -98,11 +114,9 @@ class HelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(32, strlen($random));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function test__generate_random_bytes_error_on_invalid_length()
     {
+        $this->expectException(\InvalidArgumentException::class);
         Helper::generateRandomBytes('');
     }
 

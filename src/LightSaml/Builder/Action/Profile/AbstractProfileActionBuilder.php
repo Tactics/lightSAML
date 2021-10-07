@@ -17,15 +17,12 @@ use LightSaml\Error\LightSamlBuildException;
 
 abstract class AbstractProfileActionBuilder extends CompositeActionBuilder
 {
-    /** @var  BuildContainerInterface */
+    /** @var BuildContainerInterface */
     protected $buildContainer;
 
     /** @var bool */
     private $initialized = false;
 
-    /**
-     * @param BuildContainerInterface $buildContainer
-     */
     public function __construct(BuildContainerInterface $buildContainer)
     {
         $this->buildContainer = $buildContainer;

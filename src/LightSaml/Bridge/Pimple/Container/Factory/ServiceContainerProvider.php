@@ -37,20 +37,15 @@ use Pimple\ServiceProviderInterface;
 
 class ServiceContainerProvider implements ServiceProviderInterface
 {
-    /** @var  CredentialContainerInterface */
+    /** @var CredentialContainerInterface */
     private $credentialContainer;
 
     /** @var SystemContainerInterface */
     private $systemContainer;
 
-    /** @var  StoreContainerInterface */
+    /** @var StoreContainerInterface */
     private $storeContainer;
 
-    /**
-     * @param CredentialContainerInterface $credentialContainer
-     * @param StoreContainerInterface      $storeContainer
-     * @param SystemContainerInterface     $systemContainer
-     */
     public function __construct(
         CredentialContainerInterface $credentialContainer,
         StoreContainerInterface $storeContainer,
@@ -85,13 +80,13 @@ class ServiceContainerProvider implements ServiceProviderInterface
         };
 
         $pimple[ServiceContainer::ENDPOINT_RESOLVER] = function () {
-            return new CompositeEndpointResolver(array(
+            return new CompositeEndpointResolver([
                 new BindingEndpointResolver(),
                 new DescriptorTypeEndpointResolver(),
                 new ServiceTypeEndpointResolver(),
                 new IndexEndpointResolver(),
                 new LocationEndpointResolver(),
-            ));
+            ]);
         };
 
         $pimple[ServiceContainer::BINDING_FACTORY] = function () {

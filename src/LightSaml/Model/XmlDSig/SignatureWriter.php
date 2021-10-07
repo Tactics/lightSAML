@@ -11,13 +11,13 @@
 
 namespace LightSaml\Model\XmlDSig;
 
+use LightSaml\Credential\X509Certificate;
 use LightSaml\Meta\SigningOptions;
 use LightSaml\Model\Context\DeserializationContext;
 use LightSaml\Model\Context\SerializationContext;
 use LightSaml\SamlConstants;
-use LightSaml\Credential\X509Certificate;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class SignatureWriter extends Signature
 {
@@ -30,12 +30,12 @@ class SignatureWriter extends Signature
     /** @var X509Certificate */
     protected $certificate;
 
+    protected $digestAlgorithm = XMLSecurityDSig::SHA1;
+
     /** @var SigningOptions */
     protected $signingOptions;
 
     /**
-     * @param SigningOptions $options
-     *
      * @return SignatureWriter
      */
     public static function create(SigningOptions $options)
@@ -47,9 +47,6 @@ class SignatureWriter extends Signature
     }
 
     /**
-     * @param X509Certificate $certificate
-     * @param XMLSecurityKey  $xmlSecurityKey
-     *
      * @return SignatureWriter
      */
     public static function createByKeyAndCertificate(X509Certificate $certificate, XMLSecurityKey $xmlSecurityKey)
@@ -60,13 +57,33 @@ class SignatureWriter extends Signature
     }
 
     /**
-     * @param X509Certificate|null $certificate
-     * @param XMLSecurityKey|null  $xmlSecurityKey
+     * @param string $digestAlgorithm
      */
-    public function __construct(X509Certificate $certificate = null, XMLSecurityKey $xmlSecurityKey = null)
+    public function __construct(X509Certificate $certificate = null, XMLSecurityKey $xmlSecurityKey = null, $digestAlgorithm = XMLSecurityDSig::SHA1)
     {
         $this->certificate = $certificate;
         $this->xmlSecurityKey = $xmlSecurityKey;
+        $this->digestAlgorithm = $digestAlgorithm;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDigestAlgorithm()
+    {
+        return $this->digestAlgorithm;
+    }
+
+    /**
+     * @param string $digestAlgorithm
+     *
+     * @return SignatureWriter
+     */
+    public function setDigestAlgorithm($digestAlgorithm)
+    {
+        $this->digestAlgorithm = $digestAlgorithm;
+
+        return $this;
     }
 
     /**
@@ -78,8 +95,6 @@ class SignatureWriter extends Signature
     }
 
     /**
-     * @param SigningOptions $signingOptions
-     *
      * @return SignatureWriter
      */
     public function setSigningOptions(SigningOptions $signingOptions)
@@ -110,8 +125,6 @@ class SignatureWriter extends Signature
     }
 
     /**
-     * @param XMLSecurityKey $key
-     *
      * @return SignatureWriter
      */
     public function setXmlSecurityKey(XMLSecurityKey $key)
@@ -130,8 +143,6 @@ class SignatureWriter extends Signature
     }
 
     /**
-     * @param X509Certificate $certificate
-     *
      * @return SignatureWriter
      */
     public function setCertificate(X509Certificate $certificate)
@@ -149,10 +160,6 @@ class SignatureWriter extends Signature
         return $this->certificate;
     }
 
-    /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     */
     public function serialize(\DOMNode $parent, SerializationContext $context)
     {
         if ($this->signingOptions && false === $this->signingOptions->isEnabled()) {
@@ -162,25 +169,12 @@ class SignatureWriter extends Signature
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->setCanonicalMethod($this->getCanonicalMethod());
         $key = $this->getXmlSecurityKey();
-        switch ($key->type) {
-            case XMLSecurityKey::RSA_SHA256:
-                $type = XMLSecurityDSig::SHA256;
-                break;
-            case XMLSecurityKey::RSA_SHA384:
-                $type = XMLSecurityDSig::SHA384;
-                break;
-            case XMLSecurityKey::RSA_SHA512:
-                $type = XMLSecurityDSig::SHA512;
-                break;
-            default:
-                $type = XMLSecurityDSig::SHA1;
-        }
 
         $objXMLSecDSig->addReferenceList(
-            array($parent),
-            $type,
-            array(SamlConstants::XMLSEC_TRANSFORM_ALGORITHM_ENVELOPED_SIGNATURE, XMLSecurityDSig::EXC_C14N),
-            array('id_name' => $this->getIDName(), 'overwrite' => false)
+            [$parent],
+            $this->digestAlgorithm,
+            [SamlConstants::XMLSEC_TRANSFORM_ALGORITHM_ENVELOPED_SIGNATURE, XMLSecurityDSig::EXC_C14N],
+            ['id_name' => $this->getIDName(), 'overwrite' => false]
         );
 
         $objXMLSecDSig->sign($key);
@@ -193,17 +187,13 @@ class SignatureWriter extends Signature
         );
 
         $firstChild = $parent->hasChildNodes() ? $parent->firstChild : null;
-        if ($firstChild && $firstChild->localName == 'Issuer') {
+        if ($firstChild && 'Issuer' == $firstChild->localName) {
             // The signature node should come after the issuer node
             $firstChild = $firstChild->nextSibling;
         }
         $objXMLSecDSig->insertSignature($parent, $firstChild);
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
         throw new \LogicException('SignatureWriter can not be deserialized');

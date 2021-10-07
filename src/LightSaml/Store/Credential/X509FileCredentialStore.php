@@ -12,9 +12,9 @@
 namespace LightSaml\Store\Credential;
 
 use LightSaml\Credential\CredentialInterface;
-use LightSaml\Credential\X509Credential;
 use LightSaml\Credential\KeyHelper;
 use LightSaml\Credential\X509Certificate;
+use LightSaml\Credential\X509Credential;
 
 class X509FileCredentialStore implements CredentialStoreInterface
 {
@@ -59,9 +59,10 @@ class X509FileCredentialStore implements CredentialStoreInterface
         }
 
         if (null == $this->credential) {
+            $certificate = X509Certificate::fromFile($this->certificatePath);
             $this->credential = new X509Credential(
-                X509Certificate::fromFile($this->certificatePath),
-                KeyHelper::createPrivateKey($this->keyPath, $this->password, true)
+                $certificate,
+                KeyHelper::createPrivateKey($this->keyPath, $this->password, true, $certificate->getSignatureAlgorithm())
             );
             $this->credential->setEntityId($this->entityId);
         }

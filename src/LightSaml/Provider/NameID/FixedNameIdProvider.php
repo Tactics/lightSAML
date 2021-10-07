@@ -16,20 +16,25 @@ use LightSaml\Model\Assertion\NameID;
 
 class FixedNameIdProvider implements NameIdProviderInterface
 {
-    /** @var  NameID|null */
+    /** @var NameID|null */
     protected $nameId;
 
-    /**
-     * @param NameID|null $nameId
-     */
     public function __construct(NameID $nameId = null)
     {
         $this->nameId = $nameId;
     }
 
     /**
-     * @param AbstractProfileContext $context
-     *
+     * @return FixedNameIdProvider
+     */
+    public function setNameId(NameID $nameId = null)
+    {
+        $this->nameId = $nameId;
+
+        return $this;
+    }
+
+    /**
      * @return NameID|null
      */
     public function getNameID(AbstractProfileContext $context)

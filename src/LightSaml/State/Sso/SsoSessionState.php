@@ -12,35 +12,41 @@
 namespace LightSaml\State\Sso;
 
 use LightSaml\Error\LightSamlException;
+use LightSaml\Meta\ParameterBag;
 
 class SsoSessionState implements \Serializable
 {
-    /** @var  string */
+    /** @var string */
     protected $idpEntityId;
 
-    /** @var  string */
+    /** @var string */
     protected $spEntityId;
 
-    /** @var  string */
+    /** @var string */
     protected $nameId;
 
-    /** @var  string */
+    /** @var string */
     protected $nameIdFormat;
 
-    /** @var  string */
+    /** @var string */
     protected $sessionIndex;
 
-    /** @var  \DateTime */
+    /** @var \DateTime */
     protected $sessionInstant;
 
-    /** @var  \DateTime */
+    /** @var \DateTime */
     protected $firstAuthOn;
 
-    /** @var  \DateTime */
+    /** @var \DateTime */
     protected $lastAuthOn;
 
-    /** @var  array */
-    protected $options = [];
+    /** @var ParameterBag */
+    protected $parameters;
+
+    public function __construct()
+    {
+        $this->parameters = new ParameterBag();
+    }
 
     /**
      * @return string
@@ -203,14 +209,26 @@ class SsoSessionState implements \Serializable
     }
 
     /**
+     * @return ParameterBag
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @deprecated Since 1.2, will be removed in 2.0. Use getParameters() instead
+     *
      * @return array
      */
     public function getOptions()
     {
-        return $this->options;
+        return $this->parameters->all();
     }
 
     /**
+     * @deprecated Since 1.2, will be removed in 2.0. Use getParameters() instead
+     *
      * @param string $name
      * @param mixed  $value
      *
@@ -218,31 +236,35 @@ class SsoSessionState implements \Serializable
      */
     public function addOption($name, $value)
     {
-        $this->options[$name] = $value;
+        $this->parameters->set($name, $value);
 
         return $this;
     }
 
     /**
+     * @deprecated Since 1.2, will be removed in 2.0. Use getParameters() instead
+     *
      * @param string $name
      *
      * @return SsoSessionState
      */
     public function removeOption($name)
     {
-        unset($this->options[$name]);
+        $this->parameters->remove($name);
 
         return $this;
     }
 
     /**
+     * @deprecated Since 1.2, will be removed in 2.0. Use getParameters() instead
+     *
      * @param string $name
      *
      * @return bool
      */
     public function hasOption($name)
     {
-        return isset($this->options[$name]);
+        return $this->parameters->has($name);
     }
 
     /**
@@ -260,19 +282,15 @@ class SsoSessionState implements \Serializable
             return $this->idpEntityId;
         }
 
-        throw new LightSamlException(sprintf(
-            'Party "%s" is not included in sso session between "%s" and "%s"',
-            $partyId,
-            $this->idpEntityId,
-            $this->spEntityId
-        ));
+        throw new LightSamlException(sprintf('Party "%s" is not included in sso session between "%s" and "%s"', $partyId, $this->idpEntityId, $this->spEntityId));
     }
+
     /**
      * @return string the string representation of the object or null
      */
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->idpEntityId,
             $this->spEntityId,
             $this->nameId,
@@ -281,8 +299,9 @@ class SsoSessionState implements \Serializable
             $this->sessionInstant,
             $this->firstAuthOn,
             $this->lastAuthOn,
-            $this->options,
-        ));
+            [],
+            $this->parameters,
+        ]);
     }
 
     /**
@@ -307,7 +326,13 @@ class SsoSessionState implements \Serializable
             $this->sessionInstant,
             $this->firstAuthOn,
             $this->lastAuthOn,
-            $this->options
+            $options,
+            $this->parameters
         ) = $data;
+
+        // if deserialized from old format, set old options to new parameters
+        if ($options && 0 == $this->parameters->count()) {
+            $this->parameters->replace($options);
+        }
     }
 }

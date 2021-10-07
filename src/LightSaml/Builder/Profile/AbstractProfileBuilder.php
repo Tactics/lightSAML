@@ -16,12 +16,9 @@ use LightSaml\Builder\Context\ProfileContextBuilder;
 
 abstract class AbstractProfileBuilder implements ProfileBuilderInterface
 {
-    /** @var  BuildContainerInterface */
+    /** @var BuildContainerInterface */
     protected $container;
 
-    /**
-     * @param BuildContainerInterface $buildContainer
-     */
     public function __construct(BuildContainerInterface $buildContainer)
     {
         $this->container = $buildContainer;

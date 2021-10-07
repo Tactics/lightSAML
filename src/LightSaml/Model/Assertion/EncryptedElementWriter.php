@@ -11,26 +11,43 @@
 
 namespace LightSaml\Model\Assertion;
 
-use LightSaml\Model\Context\DeserializationContext;
-use LightSaml\Model\Context\SerializationContext;
 use LightSaml\Error\LightSamlException;
 use LightSaml\Model\AbstractSamlModel;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
+use LightSaml\Model\Context\DeserializationContext;
+use LightSaml\Model\Context\SerializationContext;
 use RobRichards\XMLSecLibs\XMLSecEnc;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 abstract class EncryptedElementWriter extends EncryptedElement
 {
     /** @var \DOMElement */
     protected $encryptedElement;
 
+    /** @var string */
+    protected $blockEncryptionAlgorithm = XMLSecurityKey::AES128_CBC;
+
+    /** @var string */
+    protected $keyTransportEncryption = XMLSecurityKey::RSA_1_5;
+
     /**
-     * @param AbstractSamlModel $object
-     * @param XMLSecurityKey    $key
-     *
+     * @param string $blockEncryptionAlgorithm
+     * @param string $keyTransportEncryption
+     */
+    public function __construct($blockEncryptionAlgorithm = XMLSecurityKey::AES128_CBC, $keyTransportEncryption = XMLSecurityKey::RSA_1_5)
+    {
+        $this->blockEncryptionAlgorithm = $blockEncryptionAlgorithm;
+        $this->keyTransportEncryption = $keyTransportEncryption;
+    }
+
+    /**
      * @return SerializationContext
      */
     public function encrypt(AbstractSamlModel $object, XMLSecurityKey $key)
     {
+        $oldKey = $key;
+        $key = new XMLSecurityKey($this->keyTransportEncryption, ['type' => 'public']);
+        $key->loadKey($oldKey->key);
+
         $serializationContext = new SerializationContext();
         $object->serialize($serializationContext->getDocument(), $serializationContext);
 
@@ -52,7 +69,7 @@ abstract class EncryptedElementWriter extends EncryptedElement
             case XMLSecurityKey::RSA_SHA384:
             case XMLSecurityKey::RSA_SHA512:
             case XMLSecurityKey::RSA_OAEP_MGF1P:
-                $symmetricKey = new XMLSecurityKey(XMLSecurityKey::AES128_CBC);
+                $symmetricKey = new XMLSecurityKey($this->blockEncryptionAlgorithm);
                 $symmetricKey->generateSessionKey();
 
                 $enc->encryptKey($key, $symmetricKey);
@@ -69,17 +86,11 @@ abstract class EncryptedElementWriter extends EncryptedElement
     }
 
     /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     *
      * @return \DOMElement
      */
     abstract protected function createRootElement(\DOMNode $parent, SerializationContext $context);
 
     /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     *
      * @return void
      */
     public function serialize(\DOMNode $parent, SerializationContext $context)
@@ -93,10 +104,6 @@ abstract class EncryptedElementWriter extends EncryptedElement
         $root->appendChild($context->getDocument()->importNode($this->encryptedElement, true));
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
         throw new \LogicException('EncryptedElementWriter can not be used for deserialization');

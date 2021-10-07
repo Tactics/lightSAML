@@ -11,10 +11,10 @@
 
 namespace LightSaml\Model\Protocol;
 
-use LightSaml\Model\Context\DeserializationContext;
-use LightSaml\Model\Context\SerializationContext;
 use LightSaml\Model\Assertion\Conditions;
 use LightSaml\Model\Assertion\Subject;
+use LightSaml\Model\Context\DeserializationContext;
+use LightSaml\Model\Context\SerializationContext;
 use LightSaml\SamlConstants;
 
 class AuthnRequest extends AbstractRequest
@@ -76,7 +76,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @param null|string $providerName
+     * @param string|null $providerName
      *
      * @return AuthnRequest
      */
@@ -88,7 +88,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getProviderName()
     {
@@ -96,7 +96,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @param null|string $protocolBinding
+     * @param string|null $protocolBinding
      *
      * @return AuthnRequest
      */
@@ -108,7 +108,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getProtocolBinding()
     {
@@ -142,7 +142,7 @@ class AuthnRequest extends AbstractRequest
      */
     public function setIsPassive($isPassive)
     {
-        $this->isPassive = strcasecmp($isPassive, 'true') == 0 || $isPassive === true || $isPassive == 1;
+        $this->isPassive = 0 == strcasecmp($isPassive, 'true') || true === $isPassive || 1 == $isPassive;
 
         return $this;
     }
@@ -160,7 +160,7 @@ class AuthnRequest extends AbstractRequest
      */
     public function getIsPassiveString()
     {
-        if ($this->isPassive === null) {
+        if (null === $this->isPassive) {
             return null;
         }
 
@@ -174,7 +174,7 @@ class AuthnRequest extends AbstractRequest
      */
     public function setForceAuthn($forceAuthn)
     {
-        $this->forceAuthn = strcasecmp($forceAuthn, 'true') == 0 || $forceAuthn === true || $forceAuthn == 1;
+        $this->forceAuthn = 0 == strcasecmp($forceAuthn, 'true') || true === $forceAuthn || 1 == $forceAuthn;
 
         return $this;
     }
@@ -192,7 +192,7 @@ class AuthnRequest extends AbstractRequest
      */
     public function getForceAuthnString()
     {
-        if ($this->forceAuthn === null) {
+        if (null === $this->forceAuthn) {
             return null;
         }
 
@@ -220,13 +220,13 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @param null|int $attributeConsumingServiceIndex
+     * @param int|null $attributeConsumingServiceIndex
      *
      * @return AuthnRequest
      */
     public function setAttributeConsumingServiceIndex($attributeConsumingServiceIndex)
     {
-        $this->attributeConsumingServiceIndex = $attributeConsumingServiceIndex !== null
+        $this->attributeConsumingServiceIndex = null !== $attributeConsumingServiceIndex
             ? intval(((string) $attributeConsumingServiceIndex))
             : null;
 
@@ -234,7 +234,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @return null|int
+     * @return int|null
      */
     public function getAttributeConsumingServiceIndex()
     {
@@ -242,7 +242,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @param null|string $assertionConsumerServiceURL
+     * @param string|null $assertionConsumerServiceURL
      *
      * @return AuthnRequest
      */
@@ -254,7 +254,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @return null|string
+     * @return string|null
      */
     public function getAssertionConsumerServiceURL()
     {
@@ -262,13 +262,13 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @param null|int $assertionConsumerServiceIndex
+     * @param int|null $assertionConsumerServiceIndex
      *
      * @return AuthnRequest
      */
     public function setAssertionConsumerServiceIndex($assertionConsumerServiceIndex)
     {
-        $this->assertionConsumerServiceIndex = $assertionConsumerServiceIndex !== null
+        $this->assertionConsumerServiceIndex = null !== $assertionConsumerServiceIndex
             ? intval((string) $assertionConsumerServiceIndex)
             : null;
 
@@ -276,7 +276,7 @@ class AuthnRequest extends AbstractRequest
     }
 
     /**
-     * @return null|int
+     * @return int|null
      */
     public function getAssertionConsumerServiceIndex()
     {
@@ -286,9 +286,6 @@ class AuthnRequest extends AbstractRequest
     //endregion
 
     /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     *
      * @return void
      */
     public function serialize(\DOMNode $parent, SerializationContext $context)
@@ -297,36 +294,32 @@ class AuthnRequest extends AbstractRequest
 
         parent::serialize($result, $context);
 
-        $this->attributesToXml(array(
+        $this->attributesToXml([
                 'ForceAuthn', 'IsPassive', 'ProtocolBinding', 'AssertionConsumerServiceIndex',
                 'AssertionConsumerServiceURL', 'AttributeConsumingServiceIndex', 'ProviderName',
-            ), $result);
+            ], $result);
 
-        $this->singleElementsToXml(array('Subject', 'NameIDPolicy', 'Conditions'), $result, $context);
+        $this->singleElementsToXml(['Subject', 'NameIDPolicy', 'Conditions'], $result, $context);
 
         // must be last in order signature to include them all
-        $this->singleElementsToXml(array('Signature'), $result, $context);
+        $this->singleElementsToXml(['Signature'], $result, $context);
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
         $this->checkXmlNodeName($node, 'AuthnRequest', SamlConstants::NS_PROTOCOL);
 
         parent::deserialize($node, $context);
 
-        $this->attributesFromXml($node, array(
+        $this->attributesFromXml($node, [
             'ForceAuthn', 'IsPassive', 'ProtocolBinding', 'AssertionConsumerServiceIndex',
             'AssertionConsumerServiceURL', 'AttributeConsumingServiceIndex', 'ProviderName',
-        ));
+        ]);
 
-        $this->singleElementsFromXml($node, $context, array(
-            'Subject' => array('saml', 'LightSaml\Model\Assertion\Subject'),
-            'NameIDPolicy' => array('samlp', 'LightSaml\Model\Protocol\NameIDPolicy'),
-            'Conditions' => array('saml', 'LightSaml\Model\Assertion\Conditions'),
-        ));
+        $this->singleElementsFromXml($node, $context, [
+            'Subject' => ['saml', 'LightSaml\Model\Assertion\Subject'],
+            'NameIDPolicy' => ['samlp', 'LightSaml\Model\Protocol\NameIDPolicy'],
+            'Conditions' => ['saml', 'LightSaml\Model\Assertion\Conditions'],
+        ]);
     }
 }

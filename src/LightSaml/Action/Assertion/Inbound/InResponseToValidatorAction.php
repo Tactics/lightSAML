@@ -22,13 +22,9 @@ use Psr\Log\LoggerInterface;
 
 class InResponseToValidatorAction extends AbstractAssertionAction
 {
-    /** @var  RequestStateStoreInterface */
+    /** @var RequestStateStoreInterface */
     protected $requestStore;
 
-    /**
-     * @param LoggerInterface            $logger
-     * @param RequestStateStoreInterface $requestStore
-     */
     public function __construct(LoggerInterface $logger, RequestStateStoreInterface $requestStore)
     {
         parent::__construct($logger);
@@ -36,9 +32,6 @@ class InResponseToValidatorAction extends AbstractAssertionAction
         $this->requestStore = $requestStore;
     }
 
-    /**
-     * @param AssertionContext $context
-     */
     protected function doExecute(AssertionContext $context)
     {
         if (null === $context->getAssertion()->getSubject()) {
@@ -62,8 +55,7 @@ class InResponseToValidatorAction extends AbstractAssertionAction
     }
 
     /**
-     * @param string           $inResponseTo
-     * @param AssertionContext $context
+     * @param string $inResponseTo
      *
      * @return \LightSaml\State\Request\RequestState
      */

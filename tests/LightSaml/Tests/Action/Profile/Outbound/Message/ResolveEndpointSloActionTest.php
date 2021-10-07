@@ -13,7 +13,6 @@ use LightSaml\Model\Metadata\SpSsoDescriptor;
 use LightSaml\Model\Protocol\AuthnRequest;
 use LightSaml\Resolver\Endpoint\EndpointResolverInterface;
 use LightSaml\State\Sso\SsoSessionState;
-use LightSaml\Tests\TestHelper;
 use Psr\Log\LoggerInterface;
 
 class ResolveEndpointSloActionTest extends AbstractResolveEndpointActionTest
@@ -40,7 +39,7 @@ class ResolveEndpointSloActionTest extends AbstractResolveEndpointActionTest
         $this->setEndpointResolver(true, function (CriteriaSet $criteriaSet) {
             $this->criteriaSetShouldHaveServiceTypeCriteria($criteriaSet, SingleLogoutService::class);
 
-            return [TestHelper::getEndpointReferenceMock($this, $endpoint = new SingleLogoutService())];
+            return [$this->getEndpointReferenceMock($endpoint = new SingleLogoutService())];
         });
 
         $this->action->execute($context);
@@ -57,7 +56,7 @@ class ResolveEndpointSloActionTest extends AbstractResolveEndpointActionTest
         $this->setEndpointResolver(true, function (CriteriaSet $criteriaSet) {
             $this->criteriaSetShouldHaveDescriptorTypeCriteria($criteriaSet, SpSsoDescriptor::class);
 
-            return [TestHelper::getEndpointReferenceMock($this, $endpoint = new SingleLogoutService())];
+            return [$this->getEndpointReferenceMock($endpoint = new SingleLogoutService())];
         });
 
         $this->action->execute($context);
@@ -74,18 +73,16 @@ class ResolveEndpointSloActionTest extends AbstractResolveEndpointActionTest
         $this->setEndpointResolver(true, function (CriteriaSet $criteriaSet) {
             $this->criteriaSetShouldHaveDescriptorTypeCriteria($criteriaSet, IdpSsoDescriptor::class);
 
-            return [TestHelper::getEndpointReferenceMock($this, $endpoint = new SingleLogoutService())];
+            return [$this->getEndpointReferenceMock($endpoint = new SingleLogoutService())];
         });
 
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlContextException
-     * @expectedExceptionMessage Unable to resolve logout target descriptor type
-     */
     public function test_throws_context_exception_own_entity_id_does_not_match_sso_idp_nor_sp()
     {
+        $this->expectExceptionMessage("Unable to resolve logout target descriptor type");
+        $this->expectException(\LightSaml\Error\LightSamlContextException::class);
         $message = new AuthnRequest();
 
         $context = $this->createContext(ProfileContext::ROLE_IDP, $message);

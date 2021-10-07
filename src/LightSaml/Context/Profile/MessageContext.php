@@ -21,10 +21,10 @@ use LightSaml\Model\Protocol\SamlMessage;
 
 class MessageContext extends AbstractProfileContext
 {
-    /** @var  SamlMessage */
+    /** @var SamlMessage */
     private $message;
 
-    /** @var  string */
+    /** @var string */
     private $bindingType;
 
     /**
@@ -56,8 +56,6 @@ class MessageContext extends AbstractProfileContext
     }
 
     /**
-     * @param SamlMessage|null $message
-     *
      * @return MessageContext
      */
     public function setMessage(SamlMessage $message = null)

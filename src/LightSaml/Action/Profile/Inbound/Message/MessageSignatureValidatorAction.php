@@ -15,9 +15,9 @@ use LightSaml\Action\Profile\AbstractProfileAction;
 use LightSaml\Context\Profile\Helper\LogHelper;
 use LightSaml\Context\Profile\Helper\MessageContextHelper;
 use LightSaml\Context\Profile\ProfileContext;
+use LightSaml\Credential\Criteria\MetadataCriteria;
 use LightSaml\Error\LightSamlModelException;
 use LightSaml\Model\XmlDSig\AbstractSignatureReader;
-use LightSaml\Credential\Criteria\MetadataCriteria;
 use LightSaml\Validator\Model\Signature\SignatureValidatorInterface;
 use Psr\Log\LoggerInterface;
 
@@ -26,13 +26,9 @@ use Psr\Log\LoggerInterface;
  */
 class MessageSignatureValidatorAction extends AbstractProfileAction
 {
-    /** @var  SignatureValidatorInterface */
+    /** @var SignatureValidatorInterface */
     protected $signatureValidator;
 
-    /**
-     * @param LoggerInterface             $logger
-     * @param SignatureValidatorInterface $signatureValidator
-     */
     public function __construct(LoggerInterface $logger, SignatureValidatorInterface $signatureValidator)
     {
         parent::__construct($logger);
@@ -41,8 +37,6 @@ class MessageSignatureValidatorAction extends AbstractProfileAction
     }
 
     /**
-     * @param ProfileContext $context
-     *
      * @return void
      */
     protected function doExecute(ProfileContext $context)
@@ -63,9 +57,9 @@ class MessageSignatureValidatorAction extends AbstractProfileAction
                 $keyNames = $credential->getKeyNames();
                 $this->logger->debug(
                     sprintf('Message signature validated with key "%s"', implode(', ', $keyNames)),
-                    LogHelper::getActionContext($context, $this, array(
+                    LogHelper::getActionContext($context, $this, [
                         'credential' => $credential,
-                    ))
+                    ])
                 );
             } else {
                 $this->logger->warning(

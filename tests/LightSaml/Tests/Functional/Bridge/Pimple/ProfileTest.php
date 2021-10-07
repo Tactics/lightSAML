@@ -13,12 +13,13 @@ use LightSaml\Provider\TimeProvider\TimeProviderInterface;
 use LightSaml\SamlConstants;
 use LightSaml\State\Request\RequestState;
 use LightSaml\Store\Request\RequestStateArrayStore;
+use LightSaml\Tests\BaseTestCase;
 use LightSaml\Tests\Fixtures\Meta\TimeProviderMock;
 use Pimple\Container;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-class ProfileTest extends \PHPUnit_Framework_TestCase
+class ProfileTest extends BaseTestCase
 {
     const OWN_ENTITY_ID = 'https://localhost/lightSAML/lightSAML';
 
@@ -79,6 +80,7 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('AuthnRequest', $root->getName());
         $this->assertEquals(self::OWN_ENTITY_ID, (string) $root->children('saml', true)->Issuer);
         $this->assertEquals('https://localhost/lightsaml/lightSAML-IDP/web/idp/login.php', $root['Destination']);
+        $this->assertEquals('Signature', $root->children('ds', true)->Signature->getName());
     }
 
     public function test_receive_response_profile()
@@ -108,42 +110,26 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
             ->getFirstAttributeByName(ClaimTypes::EMAIL_ADDRESS)->getFirstAttributeValue());
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlBuildException
-     * @expectedExceptionMessage Attribute value provider not set
-     */
     public function test_attribute_value_provider_throws_exception()
     {
+        $this->expectExceptionMessage("Attribute value provider not set");
+        $this->expectException(\LightSaml\Error\LightSamlBuildException::class);
         $buildContainer = $this->getBuildContainer();
         $buildContainer->getProviderContainer()->getAttributeValueProvider();
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlBuildException
-     * @expectedExceptionMessage Attribute name provider not set
-     */
-    public function test_attribute_name_provider_throws_exception()
-    {
-        $buildContainer = $this->getBuildContainer();
-        $buildContainer->getProviderContainer()->getAttributeNameProvider();
-    }
-
-    /**
-     * @expectedException \LightSaml\Error\LightSamlBuildException
-     * @expectedExceptionMessage Session info provider not set
-     */
     public function test_session_info_provider_throws_exception()
     {
+        $this->expectExceptionMessage("Session info provider not set");
+        $this->expectException(\LightSaml\Error\LightSamlBuildException::class);
         $buildContainer = $this->getBuildContainer();
         $buildContainer->getProviderContainer()->getSessionInfoProvider();
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlBuildException
-     * @expectedExceptionMessage Name ID provider not set
-     */
     public function test_name_id_provider_throws_exception()
     {
+        $this->expectExceptionMessage("Name ID provider not set");
+        $this->expectException(\LightSaml\Error\LightSamlBuildException::class);
         $buildContainer = $this->getBuildContainer();
         $buildContainer->getProviderContainer()->getNameIdProvider();
     }

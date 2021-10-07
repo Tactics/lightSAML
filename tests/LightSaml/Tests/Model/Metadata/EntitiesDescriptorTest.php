@@ -7,118 +7,108 @@ use LightSaml\Model\Context\SerializationContext;
 use LightSaml\Model\Metadata\EntitiesDescriptor;
 use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\SamlConstants;
+use LightSaml\Tests\BaseTestCase;
 
-class EntitiesDescriptorTest extends \PHPUnit_Framework_TestCase
+class EntitiesDescriptorTest extends BaseTestCase
 {
-    public function test__implement_saml_element_interface()
+    public function test_implement_saml_element_interface()
     {
-        $rc = new \ReflectionClass('LightSaml\Model\Metadata\EntitiesDescriptor');
-        $rc->implementsInterface('LightSaml\Model\SamlElementInterface');
+        $rc = new \ReflectionClass(\LightSaml\Model\Metadata\EntitiesDescriptor::class);
+        $this->assertTrue($rc->implementsInterface(\LightSaml\Model\SamlElementInterface::class));
     }
 
-    public function test__set_valid_string_to_valid_until()
+    public function test_set_valid_string_to_valid_until()
     {
         $ed = new EntitiesDescriptor();
         $ed->setValidUntil('2013-10-27T11:55:37.035Z');
+        $this->assertTrue(true);
     }
 
-    public function test__set_positive_int_to_valid_until()
+    public function test_set_positive_int_to_valid_until()
     {
         $ed = new EntitiesDescriptor();
         $ed->setValidUntil(123456);
+        $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_set_invalid_string_to_valid_until()
+    public function test_throw_on_set_invalid_string_to_valid_until()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->setValidUntil('something');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_set_negative_int_to_valid_until()
+    public function test_throw_on_set_negative_int_to_valid_until()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->setValidUntil(-1);
     }
 
-    public function test__set_valid_period_string_to_cache_duration()
+    public function test_set_valid_period_string_to_cache_duration()
     {
         $ed = new EntitiesDescriptor();
         $ed->setCacheDuration('P3D');
+        $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_invalid_period_string_set_to_cache_duration()
+    public function test_throw_on_invalid_period_string_set_to_cache_duration()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->setCacheDuration('83D2Y');
     }
 
-    public function test__add_item_entities_descriptor()
+    public function test_add_item_entities_descriptor()
     {
         $ed = new EntitiesDescriptor();
         $ed->addItem(new EntitiesDescriptor());
+        $this->assertTrue(true);
     }
 
-    public function test__add_item_entity_descriptor()
+    public function test_add_item_entity_descriptor()
     {
         $ed = new EntitiesDescriptor();
         $ed->addItem(new EntityDescriptor());
+        $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_invalid_object_type_given_to_add_item()
+    public function test_throw_on_invalid_object_type_given_to_add_item()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->addItem(new \stdClass());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_array_given_to_add_item()
+    public function test_throw_on_array_given_to_add_item()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->addItem(array());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_string_given_to_add_item()
+    public function test_throw_on_string_given_to_add_item()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->addItem('foo');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_on_int_given_to_add_item()
+    public function test_throw_on_int_given_to_add_item()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->addItem(123);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_when_itself_given_to_add_item()
+    public function test_throw_when_itself_given_to_add_item()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $ed = new EntitiesDescriptor();
         $ed->addItem($ed);
     }
 
-    public function test__contains_item_work()
+    public function test_contains_item_work()
     {
         $o1 = new EntitiesDescriptor();
         $o2 = new EntityDescriptor('ed1');
@@ -145,11 +135,9 @@ class EntitiesDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($o3->containsItem($x2));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function test__throw_when_circular_reference_detected_in_add_item()
+    public function test_throw_when_circular_reference_detected_in_add_item()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $esd1 = new EntitiesDescriptor();
         $esd1->addItem(new EntityDescriptor('ed1'));
         $esd1->addItem(new EntityDescriptor('ed2'));
@@ -165,7 +153,7 @@ class EntitiesDescriptorTest extends \PHPUnit_Framework_TestCase
         $esd3->addItem($esd1);
     }
 
-    public function test__return_recursively_all_entity_descriptors()
+    public function test_return_recursively_all_entity_descriptors()
     {
         $esd1 = new EntitiesDescriptor();
         $esd1->addItem(new EntityDescriptor('ed1'));
@@ -189,7 +177,7 @@ class EntitiesDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('ed4', $all[3]->getEntityID());
     }
 
-    public function test__serializer()
+    public function test_serializer()
     {
         $esd = new EntitiesDescriptor();
         $esd->addItem(new EntityDescriptor('ed1'));
@@ -213,7 +201,7 @@ class EntitiesDescriptorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $xpath->query('/md:EntitiesDescriptor/md:EntitiesDescriptor/md:EntityDescriptor[@entityID="ed3"]')->length);
     }
 
-    public function test__deserialize()
+    public function test_deserialize()
     {
         $xml = <<<EOT
 <?xml version="1.0"?>

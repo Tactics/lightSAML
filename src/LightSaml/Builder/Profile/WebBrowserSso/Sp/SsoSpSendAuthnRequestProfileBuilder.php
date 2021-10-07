@@ -16,6 +16,7 @@ use LightSaml\Builder\Action\Profile\SingleSignOn\Sp\SsoSpSendAuthnRequestAction
 use LightSaml\Builder\Profile\AbstractProfileBuilder;
 use LightSaml\Context\Profile\ProfileContext;
 use LightSaml\Meta\TrustOptions\TrustOptions;
+use LightSaml\Model\Metadata\EntityDescriptor;
 use LightSaml\Profile\Profiles;
 
 class SsoSpSendAuthnRequestProfileBuilder extends AbstractProfileBuilder
@@ -23,8 +24,7 @@ class SsoSpSendAuthnRequestProfileBuilder extends AbstractProfileBuilder
     protected $idpEntityId;
 
     /**
-     * @param BuildContainerInterface $buildContainer
-     * @param string                  $idpEntityId
+     * @param string $idpEntityId
      */
     public function __construct(BuildContainerInterface $buildContainer, $idpEntityId)
     {
@@ -42,11 +42,11 @@ class SsoSpSendAuthnRequestProfileBuilder extends AbstractProfileBuilder
             throw new \RuntimeException(sprintf('Unknown IDP "%s"', $this->idpEntityId));
         }
 
+        $trustOptions = $this->getTrustOptions($idpEd);
+
         $result->getPartyEntityContext()
             ->setEntityDescriptor($idpEd)
-            ->setTrustOptions(
-                $this->container->getPartyContainer()->getTrustOptionsStore()->get($this->idpEntityId) ?: new TrustOptions()
-            )
+            ->setTrustOptions($trustOptions)
         ;
 
         return $result;
@@ -74,5 +74,21 @@ class SsoSpSendAuthnRequestProfileBuilder extends AbstractProfileBuilder
     protected function getActionBuilder()
     {
         return new SsoSpSendAuthnRequestActionBuilder($this->container);
+    }
+
+    /**
+     * @return TrustOptions
+     */
+    private function getTrustOptions(EntityDescriptor $idpEd)
+    {
+        $trustOptions = $this->container->getPartyContainer()->getTrustOptionsStore()->get($this->idpEntityId) ?: new TrustOptions();
+
+        $wantAuthnRequestsSigned = $idpEd->getFirstIdpSsoDescriptor()->getWantAuthnRequestsSigned();
+
+        if (null !== $wantAuthnRequestsSigned) {
+            $trustOptions->setSignAuthnRequest($wantAuthnRequestsSigned);
+        }
+
+        return $trustOptions;
     }
 }

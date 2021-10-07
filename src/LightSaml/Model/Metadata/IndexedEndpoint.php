@@ -16,10 +16,10 @@ use LightSaml\Model\Context\SerializationContext;
 
 class IndexedEndpoint extends Endpoint
 {
-    /** @var  int */
+    /** @var int */
     protected $index;
 
-    /** @var  bool|null */
+    /** @var bool|null */
     protected $isDefault;
 
     /**
@@ -29,7 +29,7 @@ class IndexedEndpoint extends Endpoint
      */
     public function setIsDefault($isDefault)
     {
-        $this->isDefault = $isDefault !== null ? (bool) $isDefault : null;
+        $this->isDefault = filter_var($isDefault, FILTER_VALIDATE_BOOLEAN, ['flags' => FILTER_NULL_ON_FAILURE]);
 
         return $this;
     }
@@ -70,23 +70,15 @@ class IndexedEndpoint extends Endpoint
         return $this->index;
     }
 
-    /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     */
     public function serialize(\DOMNode $parent, SerializationContext $context)
     {
-        $this->attributesToXml(array('index', 'isDefault'), $parent);
+        $this->attributesToXml(['index', 'isDefault'], $parent);
         parent::serialize($parent, $context);
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
-        $this->attributesFromXml($node, array('index', 'isDefault'));
+        $this->attributesFromXml($node, ['index', 'isDefault']);
 
         parent::deserialize($node, $context);
     }

@@ -11,9 +11,9 @@
 
 namespace LightSaml\Model\Protocol;
 
+use LightSaml\Model\AbstractSamlModel;
 use LightSaml\Model\Context\DeserializationContext;
 use LightSaml\Model\Context\SerializationContext;
-use LightSaml\Model\AbstractSamlModel;
 use LightSaml\SamlConstants;
 
 class NameIDPolicy extends AbstractSamlModel
@@ -50,10 +50,10 @@ class NameIDPolicy extends AbstractSamlModel
      */
     public function setAllowCreate($allowCreate)
     {
-        if ($allowCreate === null) {
+        if (null === $allowCreate) {
             $this->allowCreate = null;
         } elseif (is_string($allowCreate) || is_int($allowCreate)) {
-            $this->allowCreate = strcasecmp($allowCreate, 'true') == 0 || $allowCreate === true || $allowCreate == 1;
+            $this->allowCreate = 0 == strcasecmp($allowCreate, 'true') || true === $allowCreate || 1 == $allowCreate;
         } else {
             $this->allowCreate = (bool) $allowCreate;
         }
@@ -74,7 +74,7 @@ class NameIDPolicy extends AbstractSamlModel
      */
     public function getAllowCreateString()
     {
-        if ($this->allowCreate === null) {
+        if (null === $this->allowCreate) {
             return null;
         }
 
@@ -122,26 +122,19 @@ class NameIDPolicy extends AbstractSamlModel
     }
 
     /**
-     * @param \DOMNode             $parent
-     * @param SerializationContext $context
-     *
      * @return void
      */
     public function serialize(\DOMNode $parent, SerializationContext $context)
     {
         $result = $this->createElement('NameIDPolicy', SamlConstants::NS_PROTOCOL, $parent, $context);
 
-        $this->attributesToXml(array('Format', 'SPNameQualifier', 'AllowCreate'), $result);
+        $this->attributesToXml(['Format', 'SPNameQualifier', 'AllowCreate'], $result);
     }
 
-    /**
-     * @param \DOMNode               $node
-     * @param DeserializationContext $context
-     */
     public function deserialize(\DOMNode $node, DeserializationContext $context)
     {
         $this->checkXmlNodeName($node, 'NameIDPolicy', SamlConstants::NS_PROTOCOL);
 
-        $this->attributesFromXml($node, array('Format', 'SPNameQualifier', 'AllowCreate'));
+        $this->attributesFromXml($node, ['Format', 'SPNameQualifier', 'AllowCreate']);
     }
 }

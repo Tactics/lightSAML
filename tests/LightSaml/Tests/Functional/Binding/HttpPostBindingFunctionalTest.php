@@ -9,10 +9,11 @@ use LightSaml\Model\Protocol\AuthnRequest;
 use LightSaml\Model\XmlDSig\SignatureWriter;
 use LightSaml\Credential\KeyHelper;
 use LightSaml\Credential\X509Certificate;
+use LightSaml\Tests\BaseTestCase;
 use Symfony\Component\EventDispatcher\GenericEvent;
 use Symfony\Component\HttpFoundation\Request;
 
-class HttpPostBindingFunctionalTest extends \PHPUnit_Framework_TestCase
+class HttpPostBindingFunctionalTest extends BaseTestCase
 {
     public function test_send_authn_request()
     {
@@ -28,12 +29,13 @@ class HttpPostBindingFunctionalTest extends \PHPUnit_Framework_TestCase
         $eventDispatcherMock = $this->getEventDispatcherMock();
         $eventDispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function ($name, GenericEvent $event) {
+            ->willReturnCallback(function (GenericEvent $event, $name) {
                 $this->assertEquals(Events::BINDING_MESSAGE_SENT, $name);
                 $this->assertNotEmpty($event->getSubject());
                 $doc = new \DOMDocument();
                 $doc->loadXML($event->getSubject());
                 $this->assertEquals('AuthnRequest', $doc->firstChild->localName);
+                return $event;
             });
 
         $biding->setEventDispatcher($eventDispatcherMock);
@@ -98,12 +100,13 @@ class HttpPostBindingFunctionalTest extends \PHPUnit_Framework_TestCase
         $eventDispatcherMock = $this->getEventDispatcherMock();
         $eventDispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function ($name, GenericEvent $event) {
+            ->willReturnCallback(function (GenericEvent $event, $name) {
                 $this->assertEquals(Events::BINDING_MESSAGE_RECEIVED, $name);
                 $this->assertNotEmpty($event->getSubject());
                 $doc = new \DOMDocument();
                 $doc->loadXML($event->getSubject());
                 $this->assertEquals('AuthnRequest', $doc->firstChild->localName);
+                return $event;
             });
 
         $binding->setEventDispatcher($eventDispatcherMock);
@@ -147,6 +150,6 @@ class HttpPostBindingFunctionalTest extends \PHPUnit_Framework_TestCase
      */
     private function getEventDispatcherMock()
     {
-        return $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        return $this->getMockBuilder(\Symfony\Component\EventDispatcher\EventDispatcherInterface::class)->getMock();
     }
 }

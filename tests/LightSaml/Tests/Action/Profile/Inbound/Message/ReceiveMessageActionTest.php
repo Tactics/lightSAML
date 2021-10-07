@@ -3,28 +3,25 @@
 namespace LightSaml\Tests\Action\Profile\Inbound\Message;
 
 use LightSaml\Action\Profile\Inbound\Message\ReceiveMessageAction;
-use LightSaml\Binding\AbstractBinding;
-use LightSaml\Binding\BindingFactoryInterface;
 use LightSaml\Context\Profile\ProfileContext;
 use LightSaml\Profile\Profiles;
 use LightSaml\SamlConstants;
-use LightSaml\Tests\TestHelper;
+use LightSaml\Tests\BaseTestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class ReceiveMessageActionTest extends \PHPUnit_Framework_TestCase
+class ReceiveMessageActionTest extends BaseTestCase
 {
     public function test_constructs_with_logger_and_binding_factory()
     {
-        new ReceiveMessageAction(TestHelper::getLoggerMock($this), $this->getBindingFactoryMock());
+        new ReceiveMessageAction($this->getLoggerMock(), $this->getBindingFactoryMock());
+        $this->assertTrue(true);
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlBindingException
-     * @expectedExceptionMessage Unable to resolve binding type, invalid or unsupported http request
-     */
     public function test_throws_on_invalid_binding()
     {
-        $action = new ReceiveMessageAction($logger = TestHelper::getLoggerMock($this), $bindingFactory = $this->getBindingFactoryMock());
+        $this->expectExceptionMessage("Unable to resolve binding type, invalid or unsupported http request");
+        $this->expectException(\LightSaml\Error\LightSamlBindingException::class);
+        $action = new ReceiveMessageAction($logger = $this->getLoggerMock(), $bindingFactory = $this->getBindingFactoryMock());
 
         $context = new ProfileContext(Profiles::SSO_SP_SEND_AUTHN_REQUEST, ProfileContext::ROLE_SP);
 
@@ -44,7 +41,7 @@ class ReceiveMessageActionTest extends \PHPUnit_Framework_TestCase
 
     public function test_receives_message()
     {
-        $action = new ReceiveMessageAction($logger = TestHelper::getLoggerMock($this), $bindingFactory = $this->getBindingFactoryMock());
+        $action = new ReceiveMessageAction($logger = $this->getLoggerMock(), $bindingFactory = $this->getBindingFactoryMock());
 
         $context = new ProfileContext(Profiles::SSO_SP_SEND_AUTHN_REQUEST, ProfileContext::ROLE_SP);
         $context->getHttpRequestContext()->setRequest($request = new Request());
@@ -73,21 +70,5 @@ class ReceiveMessageActionTest extends \PHPUnit_Framework_TestCase
         $action->execute($context);
 
         $this->assertEquals($bindingType, $context->getInboundContext()->getBindingType());
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\LightSaml\Binding\AbstractBinding
-     */
-    private function getBindingMock()
-    {
-        return $this->getMockForAbstractClass(AbstractBinding::class);
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\LightSaml\Binding\BindingFactoryInterface
-     */
-    private function getBindingFactoryMock()
-    {
-        return $this->getMock(BindingFactoryInterface::class);
     }
 }

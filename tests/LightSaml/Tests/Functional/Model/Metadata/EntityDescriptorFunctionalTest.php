@@ -12,8 +12,9 @@ use LightSaml\Model\Metadata\SingleSignOnService;
 use LightSaml\Model\Metadata\SpSsoDescriptor;
 use LightSaml\Model\Metadata\SSODescriptor;
 use LightSaml\SamlConstants;
+use LightSaml\Tests\BaseTestCase;
 
-class EntityDescriptorFunctionalTest extends \PHPUnit_Framework_TestCase
+class EntityDescriptorFunctionalTest extends BaseTestCase
 {
     public function test__deserialization_idp2_ed()
     {
@@ -119,12 +120,10 @@ class EntityDescriptorFunctionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https://engine.surfconext.nl/authentication/idp/metadata', $ed->getEntityID());
     }
 
-    /**
-     * @expectedException \LightSaml\Error\LightSamlXmlException
-     * @expectedExceptionMessage Expected 'EntityDescriptor' xml node and 'urn:oasis:names:tc:SAML:2.0:metadata' namespace but got node 'EntitiesDescriptor' and namespace 'urn:oasis:names:tc:SAML:2.0:metadata'
-     */
     public function test_throws_on_entities_descriptor_document()
     {
+        $this->expectExceptionMessage("Expected 'EntityDescriptor' xml node and 'urn:oasis:names:tc:SAML:2.0:metadata' namespace but got node 'EntitiesDescriptor' and namespace 'urn:oasis:names:tc:SAML:2.0:metadata'");
+        $this->expectException(\LightSaml\Error\LightSamlXmlException::class);
         EntityDescriptor::load(__DIR__.'/../../../../../../resources/sample/EntitiesDescriptor/testshib-providers.xml');
     }
 
