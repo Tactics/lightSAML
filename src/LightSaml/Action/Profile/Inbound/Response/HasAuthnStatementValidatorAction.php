@@ -31,6 +31,6 @@ class HasAuthnStatementValidatorAction extends AbstractProfileAction
 
         $message = 'Response must have at least one Assertion containing AuthnStatement element';
         $this->logger->error($message, LogHelper::getActionErrorContext($context, $this));
-        throw new LightSamlContextException($context, $message);
+        // throw new LightSamlContextException($context, $message);
     }
 }

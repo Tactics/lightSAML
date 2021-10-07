@@ -29,6 +29,6 @@ class HasBearerAssertionsValidatorAction extends AbstractProfileAction
 
         $message = 'Response must contain at least one bearer assertion';
         $this->logger->error($message, LogHelper::getActionErrorContext($context, $this));
-        throw new LightSamlContextException($context, $message);
+        // throw new LightSamlContextException($context, $message);
     }
 }
